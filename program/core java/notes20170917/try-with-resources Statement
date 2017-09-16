@@ -1,0 +1,32 @@
+try-with-resources Statement
+
+实例：
+public static void writeToFileZipFileContents(String zipFileName, String outputFileName)
+    throws java.io.IOException {
+
+    java.nio.charset.Charset charset = java.nio.charset.Charset.forName("US-ASCII");
+    java.nio.file.Path outputFilePath = java.nio.file.Paths.get(outputFileName);
+
+    // Open zip file and create output file with try-with-resources statement
+
+    try (
+      java.util.zip.ZipFile zf = new java.util.zip.ZipFile(zipFileName);
+      java.io.BufferedWriter writer = java.nio.file.Files.newBufferedWriter(outputFilePath, charset)
+    ) {
+
+      // Enumerate each entry
+
+      for (java.util.Enumeration entries = zf.entries(); entries.hasMoreElements();) {
+
+        // Get the entry name and write it to the output file
+
+        String newLine = System.getProperty("line.separator");
+        String zipEntryName = ((java.util.zip.ZipEntry)entries.nextElement()).getName() + newLine;
+        writer.write(zipEntryName, 0, zipEntryName.length());
+      }
+    }
+  }
+说明：
+这是java7以后新的API.代替原来的 try{} catch{} finally{}
+现在语法是： try(){}cacth{} 。其中()中是声明了要使用的资源对象，这个对象只要实现AutoCloseable  或者 Closeable 接口就能被自动的关闭，而不需要finally。当然可以使用finally，但是()中资源的释放是在try 代码块执行完，在catch和finally之前。
+()中可以声明多个对象，关闭的顺序与声明顺序相反。
